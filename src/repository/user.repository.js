@@ -23,7 +23,7 @@ class UserRepository {
       .from("usuarios")
       .select("email")
       .eq("email", email)
-      .maybeSingle(); // Retorna nulo se não achar, em vez de dar erro
+      .maybeSingle();
 
     if (data) {
       return true;

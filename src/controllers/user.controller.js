@@ -1,5 +1,8 @@
 const userService = require("../services/user.service");
 const { z } = require("zod");
+const bcrypt = require("bcryptjs");
+
+const BCRYPT_ROUNDS = 10;
 
 class UserController {
   async login(request, response) {
@@ -23,7 +26,6 @@ class UserController {
 
   async register(request, response) {
     try {
-      console.log(request.body);
       const registerSchema = z
         .object({
           name: z.string(),
@@ -39,12 +41,13 @@ class UserController {
         });
 
       const { name, email, password } = registerSchema.parse(request.body);
-      console.log({ name, email, password });
+
+      const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
       const payload = {
         nome: name,
         email,
-        password,
+        password: hashedPassword,
       };
 
       const { userData, token } = await userService.register(payload);

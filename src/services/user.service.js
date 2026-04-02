@@ -1,5 +1,6 @@
 const supabase = require("../config/database");
 const userRepository = require("../repository/user.repository");
+const bcrypt = require("bcryptjs");
 const { generateToken } = require("../utils/generateToken");
 
 class UserService {
@@ -10,7 +11,9 @@ class UserService {
       throw new Error("Email inválido");
     }
 
-    if (user.senha !== password) {
+    const passwordMatch = await bcrypt.compare(password, user.senha);
+
+    if (!passwordMatch) {
       throw new Error("Senha inválida");
     }
 
@@ -23,7 +26,6 @@ class UserService {
   }
 
   async register(payload) {
-    console.log(payload);
     const isUserExist = await userRepository.verifyExistingUser(payload.email);
 
     if (isUserExist) {
