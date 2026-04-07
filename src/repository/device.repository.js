@@ -32,6 +32,29 @@ class DeviceRepository {
     return data.id;
   }
 
+  async getDevices() {
+    const { data, error } = await supabase.from("dispositivos").select("*");
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
+  async getImages(idsList) {
+    const { data, error } = await supabase
+      .from("imagens")
+      .select("*")
+      .in("id_dispositivo", idsList);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
   async saveImage(urls, result) {
     const imagesToInsert = urls.map((url) => ({
       url,

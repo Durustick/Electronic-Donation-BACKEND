@@ -16,6 +16,8 @@ router.post(
   DeviceController.register,
 );
 
+router.get("/devices", DeviceController.getDevices);
+
 //router.get("/minha-rota", authMiddleware, dashboardController)
 
 module.exports = router;

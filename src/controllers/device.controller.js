@@ -1,5 +1,4 @@
 const deviceService = require("../services/device.service");
-const { uploadBase64Images } = require("../services/upload.service");
 
 class DeviceController {
   async register(request, response) {
@@ -15,16 +14,19 @@ class DeviceController {
       description,
     };
 
-    const result = await deviceService.register(payload);
-
-    let urls = [];
-    if (images && images.length > 0) {
-      urls = await uploadBase64Images(images);
-    }
-
-    await deviceService.saveImage(urls, result);
+    const result = await deviceService.register(payload, images);
 
     return response.status(201).json(result);
+  }
+
+  async getDevices(request, response) {
+    try {
+      const result = await deviceService.getDevices();
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
   }
 }
 
