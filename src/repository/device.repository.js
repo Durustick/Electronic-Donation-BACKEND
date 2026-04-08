@@ -33,7 +33,9 @@ class DeviceRepository {
   }
 
   async getDevices() {
-    const { data, error } = await supabase.from("dispositivos").select("*");
+    const { data, error } = await supabase
+      .from("dispositivos")
+      .select("*, usuarios(nome)");
 
     if (error) {
       throw new Error(error.message);
@@ -64,6 +66,18 @@ class DeviceRepository {
     const { data, error } = await supabase
       .from("imagens")
       .insert(imagesToInsert);
+
+    if (error) throw new Error(error.message);
+  }
+
+  async postDeviceRequest({ idSolicitante, idDispositivo, justificativa }) {
+    const { data, error } = await supabase.from("solicitacoes").insert([
+      {
+        id_solicitante: idSolicitante,
+        id_dispositivo: idDispositivo,
+        justificativa,
+      },
+    ]);
 
     if (error) throw new Error(error.message);
   }
