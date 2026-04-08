@@ -28,6 +28,25 @@ class DeviceController {
       return response.status(500).json({ error: error.message });
     }
   }
+
+  async postDeviceRequest(request, response) {
+    try {
+      const { idSolicitante, idDispositivo } = request.params;
+      const { justificativa } = request.body;
+
+      const payload = {
+        idSolicitante,
+        idDispositivo,
+        justificativa,
+      };
+
+      const result = await deviceService.postDeviceRequest(payload);
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new DeviceController();

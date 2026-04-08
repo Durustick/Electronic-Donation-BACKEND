@@ -45,6 +45,10 @@ class DeviceService {
   async saveImage(urls, result) {
     await DeviceRepository.saveImage(urls, result);
   }
+
+  async postDeviceRequest(payload) {
+    await DeviceRepository.postDeviceRequest(payload);
+  }
 }
 
 module.exports = new DeviceService();

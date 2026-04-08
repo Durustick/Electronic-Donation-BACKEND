@@ -18,6 +18,11 @@ router.post(
 
 router.get("/devices", DeviceController.getDevices);
 
+router.post(
+  "/:idSolicitante/:idDispositivo/device-request",
+  DeviceController.postDeviceRequest,
+);
+
 //router.get("/minha-rota", authMiddleware, dashboardController)
 
 module.exports = router;
