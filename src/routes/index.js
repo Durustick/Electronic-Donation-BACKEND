@@ -18,6 +18,18 @@ router.post(
 
 router.get("/devices", DeviceController.getDevices);
 
+router.get(
+  "/:userId/devices",
+  authMiddleware,
+  DeviceController.getUserDevices,
+);
+
+router.get(
+  "/:userId/requests",
+  authMiddleware,
+  DeviceController.getUserRequests,
+);
+
 router.post(
   "/:idSolicitante/:idDispositivo/device-request",
   DeviceController.postDeviceRequest,

@@ -37,6 +37,30 @@ class DeviceService {
     return result;
   }
 
+  async getUserDevices(userId) {
+    const devices = await DeviceRepository.getUserDevices(userId);
+
+    if (!devices || devices.length === 0) {
+      return [];
+    }
+
+    const idsList = devices.map((r) => r.id);
+    const images = await DeviceRepository.getImages(idsList);
+
+    const result = devices.map((device) => {
+      return {
+        ...device,
+        imagens: images.filter((img) => img.id_dispositivo === device.id),
+      };
+    });
+
+    return result;
+  }
+
+  async getUserRequests(userId) {
+    return await DeviceRepository.getUserRequests(userId);
+  }
+
   async getImages(idsList) {
     const response = await DeviceRepository.getImages(idsList);
     return response;

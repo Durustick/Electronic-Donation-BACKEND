@@ -44,6 +44,32 @@ class DeviceRepository {
     return data;
   }
 
+  async getUserDevices(userId) {
+    const { data, error } = await supabase
+      .from("dispositivos")
+      .select("*, usuarios(nome)")
+      .eq("id_usuario", userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
+  async getUserRequests(userId) {
+    const { data, error } = await supabase
+      .from("solicitacoes")
+      .select("*, dispositivos(*)")
+      .eq("id_solicitante", userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
   async getImages(idsList) {
     const { data, error } = await supabase
       .from("imagens")

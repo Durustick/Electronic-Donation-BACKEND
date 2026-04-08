@@ -29,6 +29,28 @@ class DeviceController {
     }
   }
 
+  async getUserDevices(request, response) {
+    try {
+      const { userId } = request.params;
+      const result = await deviceService.getUserDevices(userId);
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
+
+  async getUserRequests(request, response) {
+    try {
+      const { userId } = request.params;
+      const result = await deviceService.getUserRequests(userId);
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
+
   async postDeviceRequest(request, response) {
     try {
       const { idSolicitante, idDispositivo } = request.params;
