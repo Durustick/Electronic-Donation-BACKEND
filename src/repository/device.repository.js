@@ -60,7 +60,7 @@ class DeviceRepository {
   async getUserRequests(userId) {
     const { data, error } = await supabase
       .from("solicitacoes")
-      .select("*, dispositivos(*)")
+      .select("*, dispositivos(*, imagens(url))")
       .eq("id_solicitante", userId);
 
     if (error) {
@@ -106,6 +106,27 @@ class DeviceRepository {
     ]);
 
     if (error) throw new Error(error.message);
+  }
+
+  async updateStatus(deviceId, status) {
+    const { data, error } = await supabase
+      .from("solicitacoes")
+      .update({ status })
+      .eq("id_dispositivo", deviceId);
+
+    if (error) throw new Error(error.message);
+  }
+
+  async userDeviceWithRequest(userId) {
+    const { data, error } = await supabase
+      .from("dispositivos")
+      .select("*, solicitacoes!inner(*)")
+      .eq("id_usuario", userId)
+      .eq("solicitacoes.status", "pendente");
+
+    if (error) throw new Error(error.message);
+
+    return data;
   }
 }
 

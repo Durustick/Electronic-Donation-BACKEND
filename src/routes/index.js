@@ -18,16 +18,24 @@ router.post(
 
 router.get("/devices", DeviceController.getDevices);
 
-router.get(
-  "/:userId/devices",
-  authMiddleware,
-  DeviceController.getUserDevices,
-);
+router.get("/:userId/devices", authMiddleware, DeviceController.getUserDevices);
 
 router.get(
   "/:userId/requests",
   authMiddleware,
   DeviceController.getUserRequests,
+);
+
+router.get(
+  "/:userId/user-device-with-request",
+  authMiddleware,
+  DeviceController.userDeviceWithRequest,
+);
+
+router.put(
+  "/:deviceId/updateStatus",
+  authMiddleware,
+  DeviceController.updateStatus,
 );
 
 router.post(

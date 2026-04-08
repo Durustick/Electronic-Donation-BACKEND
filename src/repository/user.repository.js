@@ -31,10 +31,10 @@ class UserRepository {
     return false;
   }
 
-  async register({ nome, email, password }) {
+  async register({ nome, cpf, email, password }) {
     const { data, error } = await supabase
       .from("usuarios")
-      .insert([{ nome, email, senha: password }])
+      .insert([{ nome, cpf, email, senha: password }])
       .select()
       .single();
 

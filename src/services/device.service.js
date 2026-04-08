@@ -73,6 +73,14 @@ class DeviceService {
   async postDeviceRequest(payload) {
     await DeviceRepository.postDeviceRequest(payload);
   }
+
+  async updateStatus(deviceId, status) {
+    await DeviceRepository.updateStatus(deviceId, status);
+  }
+
+  async userDeviceWithRequest(userId) {
+    return await DeviceRepository.userDeviceWithRequest(userId);
+  }
 }
 
 module.exports = new DeviceService();

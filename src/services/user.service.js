@@ -20,7 +20,7 @@ class UserService {
     const token = generateToken(user);
 
     return {
-      userData: { id: user.id, nome: user.nome, email: user.email },
+      userData: { id: user.id, nome: user.nome, cpf: user.cpf, email: user.email },
       token,
     };
   }
@@ -41,7 +41,7 @@ class UserService {
     const token = generateToken(user);
 
     return {
-      userData: { id: user.id, nome: user.nome, email: user.email },
+      userData: { id: user.id, nome: user.nome, cpf: user.cpf, email: user.email },
       token,
     };
   }

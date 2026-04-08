@@ -29,6 +29,7 @@ class UserController {
       const registerSchema = z
         .object({
           name: z.string(),
+          cpf: z.string().min(11, "CPF inválido"),
           email: z.string().email("Email inválido"),
           password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
           confirmPassword: z
@@ -40,12 +41,13 @@ class UserController {
           path: ["confirmPassword"],
         });
 
-      const { name, email, password } = registerSchema.parse(request.body);
+      const { name, cpf, email, password } = registerSchema.parse(request.body);
 
       const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
       const payload = {
         nome: name,
+        cpf,
         email,
         password: hashedPassword,
       };

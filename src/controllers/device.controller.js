@@ -69,6 +69,32 @@ class DeviceController {
       return response.status(500).json({ error: error.message });
     }
   }
+
+  async updateStatus(request, response) {
+    try {
+      const { deviceId } = request.params;
+      const { status } = request.body;
+      console.log({ status, deviceId });
+
+      const result = await deviceService.updateStatus(deviceId, status);
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
+
+  async userDeviceWithRequest(request, response) {
+    try {
+      const { userId } = request.params;
+
+      const result = await deviceService.userDeviceWithRequest(userId);
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new DeviceController();
