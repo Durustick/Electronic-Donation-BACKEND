@@ -41,6 +41,53 @@ async function uploadBase64Images(images) {
   return urls;
 }
 
+async function deleteImages(urls = []) {
+  if (!Array.isArray(urls) || urls.length === 0) {
+    console.log("Nenhuma imagem para deletar.");
+    return;
+  }
+
+  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+
+  if (!connectionString) {
+    throw new Error("AZURE_STORAGE_CONNECTION_STRING não definida.");
+  }
+
+  const blobServiceClient =
+    BlobServiceClient.fromConnectionString(connectionString);
+
+  const resultados = [];
+
+  for (const urlImagem of urls) {
+    try {
+      const url = new URL(urlImagem);
+
+      const blobName = decodeURIComponent(url.pathname.split("/").pop());
+
+      const containerClient = blobServiceClient.getContainerClient(
+        process.env.AZURE_CONTAINER_NAME,
+      );
+
+      const blobClient = containerClient.getBlobClient(blobName);
+
+      const response = await blobClient.deleteIfExists();
+
+      resultados.push({
+        url: urlImagem,
+        deletado: response.succeeded,
+      });
+    } catch (error) {
+      resultados.push({
+        url: urlImagem,
+        erro: error.message,
+      });
+    }
+  }
+
+  return resultados;
+}
+
 module.exports = {
   uploadBase64Images,
+  deleteImages,
 };

@@ -10,15 +10,27 @@ router.post("/login", UserController.login);
 
 router.post("/register", UserController.register);
 
+router.get("/devices", DeviceController.getDevices);
+
+router.get("/:userId/devices", authMiddleware, DeviceController.getUserDevices);
+
 router.post(
   "/:userId/device/register",
   authMiddleware,
   DeviceController.register,
 );
 
-router.get("/devices", DeviceController.getDevices);
+router.put(
+  "/:deviceId/device/update",
+  authMiddleware,
+  DeviceController.updateDevice,
+);
 
-router.get("/:userId/devices", authMiddleware, DeviceController.getUserDevices);
+router.delete(
+  "/:deviceId/device/delete",
+  authMiddleware,
+  DeviceController.deleteDevice,
+);
 
 router.get(
   "/:userId/requests",
@@ -40,6 +52,7 @@ router.put(
 
 router.post(
   "/:idSolicitante/:idDispositivo/device-request",
+  authMiddleware,
   DeviceController.postDeviceRequest,
 );
 

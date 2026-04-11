@@ -1,9 +1,12 @@
 const DeviceRepository = require("../repository/device.repository");
-const { uploadBase64Images } = require("../services/upload.service");
+const {
+  uploadBase64Images,
+  deleteImages,
+} = require("../services/upload.service");
 
 class DeviceService {
   async register(payload, images) {
-    const result = await DeviceRepository.register(payload);
+    const deviceId = await DeviceRepository.register(payload);
 
     let urls = [];
     if (images && images.length > 0) {
@@ -11,10 +14,10 @@ class DeviceService {
     }
 
     if (urls.length > 0) {
-      await DeviceRepository.saveImage(urls, result);
+      await DeviceRepository.saveImage(urls, deviceId);
     }
 
-    return result;
+    return deviceId;
   }
 
   async getDevices() {
@@ -66,8 +69,8 @@ class DeviceService {
     return response;
   }
 
-  async saveImage(urls, result) {
-    await DeviceRepository.saveImage(urls, result);
+  async saveImage(urls, deviceId) {
+    await DeviceRepository.saveImage(urls, deviceId);
   }
 
   async postDeviceRequest(payload) {
@@ -80,6 +83,31 @@ class DeviceService {
 
   async userDeviceWithRequest(userId) {
     return await DeviceRepository.userDeviceWithRequest(userId);
+  }
+
+  async updateDevice(payload, images, imagesToDelete) {
+    let urls = [];
+
+    if (images && images.length > 0) {
+      urls = await uploadBase64Images(images);
+    }
+
+    if (urls.length > 0) {
+      await DeviceRepository.saveImage(urls, payload.deviceId);
+    }
+
+    if (imagesToDelete.length > 0) {
+      const urls = await DeviceRepository.deleteImages(imagesToDelete);
+      await deleteImages(urls);
+    }
+
+    return await DeviceRepository.updateDevice(payload);
+  }
+
+  async deleteDevice(deviceId) {
+    const urls = await DeviceRepository.deleteDevice(deviceId);
+    console.log(urls);
+    await deleteImages(urls);
   }
 }
 
