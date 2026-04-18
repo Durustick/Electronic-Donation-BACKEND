@@ -74,7 +74,6 @@ class DeviceController {
     try {
       const { deviceId } = request.params;
       const { status } = request.body;
-      console.log({ status, deviceId });
 
       const result = await deviceService.updateStatus(deviceId, status);
 
@@ -91,6 +90,52 @@ class DeviceController {
       const result = await deviceService.userDeviceWithRequest(userId);
 
       return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
+
+  async updateDevice(request, response) {
+    try {
+      const { deviceId } = request.params;
+      const {
+        name,
+        category,
+        conservationState,
+        description,
+        images,
+        imagesToDelete,
+      } = request.body;
+
+      const payload = {
+        deviceId,
+        name,
+        category,
+        conservationState,
+        description,
+      };
+
+      const result = await deviceService.updateDevice(
+        payload,
+        images,
+        imagesToDelete,
+      );
+
+      return response.status(200).json(result);
+    } catch (error) {
+      return response.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteDevice(request, response) {
+    try {
+      const { deviceId } = request.params;
+
+      await deviceService.deleteDevice(deviceId);
+
+      return response
+        .status(200)
+        .json({ message: "Dispositivo excluído com sucesso." });
     } catch (error) {
       return response.status(500).json({ error: error.message });
     }

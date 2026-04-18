@@ -35,7 +35,7 @@ class DeviceRepository {
   async getDevices() {
     const { data, error } = await supabase
       .from("dispositivos")
-      .select("*, usuarios(nome)");
+      .select("*, usuarios(nome), solicitacoes(status)");
 
     if (error) {
       throw new Error(error.message);
@@ -47,7 +47,7 @@ class DeviceRepository {
   async getUserDevices(userId) {
     const { data, error } = await supabase
       .from("dispositivos")
-      .select("*, usuarios(nome)")
+      .select("*, usuarios(nome), solicitacoes(status)")
       .eq("id_usuario", userId);
 
     if (error) {
@@ -83,10 +83,10 @@ class DeviceRepository {
     return data;
   }
 
-  async saveImage(urls, result) {
+  async saveImage(urls, deviceId) {
     const imagesToInsert = urls.map((url) => ({
       url,
-      id_dispositivo: result,
+      id_dispositivo: deviceId,
     }));
 
     const { data, error } = await supabase
@@ -94,6 +94,18 @@ class DeviceRepository {
       .insert(imagesToInsert);
 
     if (error) throw new Error(error.message);
+  }
+
+  async deleteImages(imagesToDelete) {
+    const { data, error } = await supabase
+      .from("imagens")
+      .delete()
+      .in("id", imagesToDelete)
+      .select("url");
+
+    if (error) throw new Error(error.message);
+
+    return data.map((img) => img.url);
   }
 
   async postDeviceRequest({ idSolicitante, idDispositivo, justificativa }) {
@@ -127,6 +139,61 @@ class DeviceRepository {
     if (error) throw new Error(error.message);
 
     return data;
+  }
+
+  async updateDevice({
+    deviceId,
+    name,
+    category,
+    conservationState,
+    description,
+  }) {
+    const { data, error } = await supabase
+      .from("dispositivos")
+      .update({
+        nome_dispositivo: name,
+        categoria: category,
+        estado_conservacao: conservationState,
+        descricao: description,
+      })
+      .eq("id", deviceId)
+      .select();
+
+    if (error) throw new Error(error.message);
+
+    return data;
+  }
+
+  async deleteDevice(deviceId) {
+    const { data: imagesData, error: imagesError } = await supabase
+      .from("imagens")
+      .delete()
+      .eq("id_dispositivo", deviceId)
+      .select("url");
+
+    if (imagesError) {
+      throw new Error(imagesError.message);
+    }
+
+    const { error: reqError } = await supabase
+      .from("solicitacoes")
+      .delete()
+      .eq("id_dispositivo", deviceId);
+
+    if (reqError) {
+      throw new Error(reqError.message);
+    }
+
+    const { error: deviceError } = await supabase
+      .from("dispositivos")
+      .delete()
+      .eq("id", deviceId);
+
+    if (deviceError) {
+      throw new Error(deviceError.message);
+    }
+
+    return imagesData.map((img) => img.url);
   }
 }
 
