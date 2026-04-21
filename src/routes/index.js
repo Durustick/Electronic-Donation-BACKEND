@@ -1,59 +1,59 @@
-const express = require("express");
-const { authMiddleware } = require("../middlewares/authMiddleware");
+const express = require('express');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
-const UserController = require("../controllers/user.controller");
-const DeviceController = require("../controllers/device.controller");
+const UserController = require('../controllers/user.controller');
+const DeviceController = require('../controllers/device.controller');
 
 const router = express.Router();
 
-router.post("/login", UserController.login);
+router.post('/login', UserController.login);
 
-router.post("/register", UserController.register);
+router.post('/register', UserController.register);
 
-router.get("/devices", DeviceController.getDevices);
+router.get('/avaible-devices', DeviceController.getDevices);
 
-router.get("/:userId/devices", authMiddleware, DeviceController.getUserDevices);
+router.get('/:userId/devices', authMiddleware, DeviceController.getUserDevices);
 
 router.post(
-  "/:userId/device/register",
+  '/:userId/device/register',
   authMiddleware,
-  DeviceController.register,
+  DeviceController.register
 );
 
 router.put(
-  "/:deviceId/device/update",
+  '/:deviceId/device/update',
   authMiddleware,
-  DeviceController.updateDevice,
+  DeviceController.updateDevice
 );
 
 router.delete(
-  "/:deviceId/device/delete",
+  '/:deviceId/device/delete',
   authMiddleware,
-  DeviceController.deleteDevice,
+  DeviceController.deleteDevice
 );
 
 router.get(
-  "/:userId/requests",
+  '/:userId/requests',
   authMiddleware,
-  DeviceController.getUserRequests,
+  DeviceController.getUserRequests
 );
 
 router.get(
-  "/:userId/user-device-with-request",
+  '/:userId/user-device-with-request',
   authMiddleware,
-  DeviceController.userDeviceWithRequest,
+  DeviceController.userDeviceWithRequest
 );
 
 router.put(
-  "/:deviceId/updateStatus",
+  '/:deviceId/updateStatus',
   authMiddleware,
-  DeviceController.updateStatus,
+  DeviceController.updateStatus
 );
 
 router.post(
-  "/:idSolicitante/:idDispositivo/device-request",
+  '/:idSolicitante/:idDispositivo/device-request',
   authMiddleware,
-  DeviceController.postDeviceRequest,
+  DeviceController.postDeviceRequest
 );
 
 //router.get("/minha-rota", authMiddleware, dashboardController)

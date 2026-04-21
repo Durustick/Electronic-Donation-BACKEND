@@ -1,8 +1,8 @@
-const DeviceRepository = require("../repository/device.repository");
+const DeviceRepository = require('../repository/device.repository');
 const {
   uploadBase64Images,
   deleteImages,
-} = require("../services/upload.service");
+} = require('../services/upload.service');
 
 class DeviceService {
   async register(payload, images) {
@@ -20,8 +20,8 @@ class DeviceService {
     return deviceId;
   }
 
-  async getDevices() {
-    const devices = await DeviceRepository.getDevices();
+  async getDevices(userId) {
+    const devices = await DeviceRepository.getDevices(userId);
 
     if (!devices || devices.length === 0) {
       return [];
@@ -50,12 +50,19 @@ class DeviceService {
     const idsList = devices.map((r) => r.id);
     const images = await DeviceRepository.getImages(idsList);
 
-    const result = devices.map((device) => {
+    const devicesWithImages = devices.map((device) => {
       return {
         ...device,
         imagens: images.filter((img) => img.id_dispositivo === device.id),
       };
     });
+
+    const result = devicesWithImages.map((device) => ({
+      ...device,
+      status: device.solicitacoes?.some((req) => req.status === 'aceito')
+        ? 'Aceito'
+        : 'Pendente',
+    }));
 
     return result;
   }
@@ -82,7 +89,20 @@ class DeviceService {
   }
 
   async userDeviceWithRequest(userId) {
-    return await DeviceRepository.userDeviceWithRequest(userId);
+    const data = await DeviceRepository.userDeviceWithRequest(userId);
+    return (
+      data?.flatMap((device) => {
+        if (!device.solicitacoes) {
+          return [];
+        }
+        return device.solicitacoes
+          .filter((req) => req.status === 'pendente')
+          .map((req) => ({
+            ...req,
+            dispositivo: { nome_dispositivo: device.nome_dispositivo },
+          }));
+      }) || []
+    );
   }
 
   async updateDevice(payload, images, imagesToDelete) {
@@ -106,7 +126,7 @@ class DeviceService {
 
   async deleteDevice(deviceId) {
     const urls = await DeviceRepository.deleteDevice(deviceId);
-    console.log(urls);
+
     await deleteImages(urls);
   }
 }
