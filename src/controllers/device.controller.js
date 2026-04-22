@@ -1,4 +1,4 @@
-const deviceService = require("../services/device.service");
+const deviceService = require('../services/device.service');
 
 class DeviceController {
   async register(request, response) {
@@ -21,7 +21,8 @@ class DeviceController {
 
   async getDevices(request, response) {
     try {
-      const result = await deviceService.getDevices();
+      const { userId } = request.query;
+      const result = await deviceService.getDevices(userId);
 
       return response.status(200).json(result);
     } catch (error) {
@@ -32,6 +33,7 @@ class DeviceController {
   async getUserDevices(request, response) {
     try {
       const { userId } = request.params;
+
       const result = await deviceService.getUserDevices(userId);
 
       return response.status(200).json(result);
@@ -118,7 +120,7 @@ class DeviceController {
       const result = await deviceService.updateDevice(
         payload,
         images,
-        imagesToDelete,
+        imagesToDelete
       );
 
       return response.status(200).json(result);
@@ -135,7 +137,7 @@ class DeviceController {
 
       return response
         .status(200)
-        .json({ message: "Dispositivo excluído com sucesso." });
+        .json({ message: 'Dispositivo excluído com sucesso.' });
     } catch (error) {
       return response.status(500).json({ error: error.message });
     }

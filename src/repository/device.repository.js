@@ -1,4 +1,4 @@
-const supabase = require("../config/database");
+const supabase = require('../config/database');
 
 class DeviceRepository {
   async register({
@@ -9,7 +9,7 @@ class DeviceRepository {
     description,
   }) {
     const { data, error } = await supabase
-      .from("dispositivos")
+      .from('dispositivos')
       .insert([
         {
           id_usuario: userId,
@@ -19,11 +19,11 @@ class DeviceRepository {
           descricao: description,
         },
       ])
-      .select("id")
+      .select('id')
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") {
+      if (error.code === 'PGRST116') {
         return null;
       }
       throw new Error(error.message);
@@ -32,10 +32,12 @@ class DeviceRepository {
     return data.id;
   }
 
-  async getDevices() {
-    const { data, error } = await supabase
-      .from("dispositivos")
-      .select("*, usuarios(nome), solicitacoes(status)");
+  async getDevices(userId) {
+    const { data, error } = userId
+      ? await supabase.rpc('listar_dispositivos_disponiveis', {
+          p_id_usuario: userId,
+        })
+      : await supabase.rpc('listar_dispositivos_disponiveis');
 
     if (error) {
       throw new Error(error.message);
@@ -46,9 +48,9 @@ class DeviceRepository {
 
   async getUserDevices(userId) {
     const { data, error } = await supabase
-      .from("dispositivos")
-      .select("*, usuarios(nome), solicitacoes(status)")
-      .eq("id_usuario", userId);
+      .from('dispositivos')
+      .select('*, usuarios(nome), solicitacoes(status)')
+      .eq('id_usuario', userId);
 
     if (error) {
       throw new Error(error.message);
@@ -59,9 +61,9 @@ class DeviceRepository {
 
   async getUserRequests(userId) {
     const { data, error } = await supabase
-      .from("solicitacoes")
-      .select("*, dispositivos(*, imagens(url))")
-      .eq("id_solicitante", userId);
+      .from('solicitacoes')
+      .select('*, dispositivos(*, imagens(url)), usuarios(nome)')
+      .eq('id_solicitante', userId);
 
     if (error) {
       throw new Error(error.message);
@@ -72,9 +74,9 @@ class DeviceRepository {
 
   async getImages(idsList) {
     const { data, error } = await supabase
-      .from("imagens")
-      .select("*")
-      .in("id_dispositivo", idsList);
+      .from('imagens')
+      .select('*')
+      .in('id_dispositivo', idsList);
 
     if (error) {
       throw new Error(error.message);
@@ -90,7 +92,7 @@ class DeviceRepository {
     }));
 
     const { data, error } = await supabase
-      .from("imagens")
+      .from('imagens')
       .insert(imagesToInsert);
 
     if (error) throw new Error(error.message);
@@ -98,10 +100,10 @@ class DeviceRepository {
 
   async deleteImages(imagesToDelete) {
     const { data, error } = await supabase
-      .from("imagens")
+      .from('imagens')
       .delete()
-      .in("id", imagesToDelete)
-      .select("url");
+      .in('id', imagesToDelete)
+      .select('url');
 
     if (error) throw new Error(error.message);
 
@@ -109,7 +111,7 @@ class DeviceRepository {
   }
 
   async postDeviceRequest({ idSolicitante, idDispositivo, justificativa }) {
-    const { data, error } = await supabase.from("solicitacoes").insert([
+    const { data, error } = await supabase.from('solicitacoes').insert([
       {
         id_solicitante: idSolicitante,
         id_dispositivo: idDispositivo,
@@ -122,19 +124,19 @@ class DeviceRepository {
 
   async updateStatus(deviceId, status) {
     const { data, error } = await supabase
-      .from("solicitacoes")
+      .from('solicitacoes')
       .update({ status })
-      .eq("id_dispositivo", deviceId);
+      .eq('id_dispositivo', deviceId);
 
     if (error) throw new Error(error.message);
   }
 
   async userDeviceWithRequest(userId) {
     const { data, error } = await supabase
-      .from("dispositivos")
-      .select("*, solicitacoes!inner(*)")
-      .eq("id_usuario", userId)
-      .eq("solicitacoes.status", "pendente");
+      .from('dispositivos')
+      .select('*, solicitacoes!inner(*)')
+      .eq('id_usuario', userId)
+      .eq('solicitacoes.status', 'pendente');
 
     if (error) throw new Error(error.message);
 
@@ -149,14 +151,14 @@ class DeviceRepository {
     description,
   }) {
     const { data, error } = await supabase
-      .from("dispositivos")
+      .from('dispositivos')
       .update({
         nome_dispositivo: name,
         categoria: category,
         estado_conservacao: conservationState,
         descricao: description,
       })
-      .eq("id", deviceId)
+      .eq('id', deviceId)
       .select();
 
     if (error) throw new Error(error.message);
@@ -166,28 +168,28 @@ class DeviceRepository {
 
   async deleteDevice(deviceId) {
     const { data: imagesData, error: imagesError } = await supabase
-      .from("imagens")
+      .from('imagens')
       .delete()
-      .eq("id_dispositivo", deviceId)
-      .select("url");
+      .eq('id_dispositivo', deviceId)
+      .select('url');
 
     if (imagesError) {
       throw new Error(imagesError.message);
     }
 
     const { error: reqError } = await supabase
-      .from("solicitacoes")
+      .from('solicitacoes')
       .delete()
-      .eq("id_dispositivo", deviceId);
+      .eq('id_dispositivo', deviceId);
 
     if (reqError) {
       throw new Error(reqError.message);
     }
 
     const { error: deviceError } = await supabase
-      .from("dispositivos")
+      .from('dispositivos')
       .delete()
-      .eq("id", deviceId);
+      .eq('id', deviceId);
 
     if (deviceError) {
       throw new Error(deviceError.message);
